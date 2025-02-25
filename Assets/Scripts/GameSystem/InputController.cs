@@ -1,4 +1,3 @@
-using GridCore;
 using GridCore.Scene;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,17 +8,9 @@ namespace GameSystem
     {
         // TODO INJECT PROPERLY
         [SerializeField] GridController _gridController;
-        //[SerializeField] GameController _gameController;
 
         private void Update()
-        {
-            // CheckForKeyboardInputs();
-
-            // if (_gameController.LifeTimeState == LifeTimeStates.Play)
-            // {
-            //     return;
-            // }
-
+        { 
             CheckForMouseInput();
         }
 
@@ -45,21 +36,6 @@ namespace GameSystem
 
             _gridController.SetDead();
             _gridController.DrawGrid();
-        }
-
-        // private void CheckForKeyboardInputs()
-        // {
-        //     if (Input.GetKeyDown(KeyCode.Space))
-        //     {
-        //         if (_gameController.LifeTimeState == LifeTimeStates.Play)
-        //         {
-        //             _gameController.StopGame();
-        //         }
-        //         else
-        //         {
-        //             _gameController.StartGame();
-        //         }
-        //     }
-        // }
+        } 
     }
 }

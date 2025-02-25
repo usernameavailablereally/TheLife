@@ -11,49 +11,51 @@ namespace GridCore.Scene
         [SerializeField] private Grid _sceneGrid; 
         [SerializeField] private Tile _aliveTile;
         [SerializeField] private Tile _deadTile;
-        [SerializeField] private int _sizeX;
-        [SerializeField] private int _sizeY;
 
-        private CellUnit[,] _grid;
+        private GridData _gridData; 
 
         private Vector3Int _gridPosition;
+        ILifeStrategy _currentLifeStrategy;
+ 
 
-        private void Awake()
+        public void InitGrid(int sizeX, int sizeY, ILifeStrategy targetStrategy)
         {
-            InitGrid();
-            DrawGrid();
-        }
-
-        public void InitGrid()
-        {
-            _grid = GridFactory.CreateGrid(_sizeX, _sizeY); 
+            _currentLifeStrategy = targetStrategy;
+            _gridData = new GridData(sizeX, sizeY)
+            {
+                Grid = GridFactory.CreateGrid(sizeX, sizeY)
+            };
         }
     
         public void DrawGrid()
         {
-            for (var i = 0; i < _sizeY; i++)
+            for (var i = 0; i < _gridData.SizeY; i++)
             {
-                for (var j = 0; j < _sizeX; j++)
+                for (var j = 0; j < _gridData.SizeX; j++)
                 {
                     var p = new Vector3Int(i, j, 0);
-                    _tilemap.SetTile(p, _grid[j, i].IsAlive() ? _aliveTile : _deadTile);
+                    _tilemap.SetTile(p, _gridData.Grid[j, i].IsAlive() ? _aliveTile : _deadTile);
                 }
             }
         }
-    
+
         // TODO fix CAMERA getter
         public void SetAlive()
         {
             _gridPosition = GridHelper.ConvertToGridPosition(_sceneGrid, TouchPositionHelper.GetMousePosition(Camera.main));
-            _grid[_gridPosition.y, _gridPosition.x].SetState(true); 
+            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true); 
             DrawGrid();
         }
 
         public void SetDead()
         {
             _gridPosition = GridHelper.ConvertToGridPosition(_sceneGrid, TouchPositionHelper.GetMousePosition(Camera.main));
-            _grid[_gridPosition.y, _gridPosition.x].SetState(false);
-        } 
+            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(false);
+        }
 
+        public void ProcessNextGeneration()
+        {
+            _currentLifeStrategy.ProcessNextGeneration(ref _gridData);
+        }
     }
 }
