@@ -1,10 +1,9 @@
-using GridCore.Raw;
-using Tools;
+using LifeStrategies;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using VContainer;
 
-namespace GridCore.Scene
+namespace GridCore
 {
     public class GridController
     {
@@ -12,18 +11,20 @@ namespace GridCore.Scene
         private readonly Grid _sceneGrid;
         private readonly Tile _aliveTile;
         private readonly Tile _deadTile;
+        private readonly Camera _mainCamera;
 
         private GridData _gridData;
         private Vector3Int _gridPosition;
         private ILifeStrategy _currentLifeStrategy;
 
-        [Inject]
-        public GridController(Tilemap tilemap, Grid sceneGrid, AssetsLoader assetsLoader)
+        [Inject] // explicit constructor injection
+        public GridController(Tilemap tilemap, Grid sceneGrid, AssetsLoader assetsLoader, Camera mainCamera)
         {
             _tilemap = tilemap;
             _sceneGrid = sceneGrid;
             _aliveTile = assetsLoader.AliveTile;
             _deadTile = assetsLoader.DeadTile;
+            _mainCamera = mainCamera;
         }
 
         public void InitGrid(int sizeX, int sizeY, ILifeStrategy targetStrategy)
@@ -31,7 +32,7 @@ namespace GridCore.Scene
             _currentLifeStrategy = targetStrategy;
             _gridData = new GridData(sizeX, sizeY)
             {
-                Grid = GridFactory.CreateGrid(sizeX, sizeY)
+                Grid = GridGenerator.CreateGrid(sizeX, sizeY)
             };
         }
 
@@ -49,14 +50,14 @@ namespace GridCore.Scene
 
         public void SetAlive()
         {
-            _gridPosition = GridHelper.ConvertToGridPosition(_sceneGrid, TouchPositionHelper.GetMousePosition(Camera.main));
+            _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true);
             DrawGrid();
         }
 
         public void SetDead()
         {
-            _gridPosition = GridHelper.ConvertToGridPosition(_sceneGrid, TouchPositionHelper.GetMousePosition(Camera.main));
+            _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(false);
         }
 

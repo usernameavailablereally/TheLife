@@ -157,6 +157,7 @@ MonoBehaviour:
   _sceneGrid: {fileID: 1800736185}
   _assetsLoader: {fileID: 619531185}
   _uiManager: {fileID: 852673173}
+  _mainCamera: {fileID: 519420031}
 --- !u!4 &169568639
 Transform:
   m_ObjectHideFlags: 0

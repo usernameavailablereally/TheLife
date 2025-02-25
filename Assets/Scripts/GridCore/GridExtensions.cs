@@ -1,15 +1,14 @@
 using System.Collections.Generic;
-using GridCore.Raw;
+using Tools;
 using UnityEngine;
 
 namespace GridCore
 {
-    public static class GridHelper
+    public static class GridExtensions
     { 
-        // TODO: MAKE EXTENSION METHODS
-        public static Vector3Int ConvertToGridPosition(Grid sceneGrid, Vector3 position)
-        {
-            return sceneGrid.WorldToCell(position);
+        public static Vector3Int ConvertToGridPosition(this Grid sceneGrid, Camera camera)
+        { 
+            return sceneGrid.WorldToCell(camera.GetMousePosition());
         }
         public static List<CellUnit> CalculateNeighbours(this GridData gridData, CellUnit cellUnit)
         {

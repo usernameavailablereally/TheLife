@@ -1,6 +1,7 @@
 using System.Linq;
+using GridCore;
 
-namespace GridCore.Raw
+namespace LifeStrategies
 {
     public class DefaultStrategy : ILifeStrategy
     {

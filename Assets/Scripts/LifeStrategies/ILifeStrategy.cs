@@ -1,4 +1,6 @@
-namespace GridCore.Raw
+using GridCore;
+
+namespace LifeStrategies
 {
     public interface ILifeStrategy
     {

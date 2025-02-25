@@ -1,8 +1,11 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "GridSettings", menuName = "Settings/GridSettings")]
-public class GridSettingsObject : ScriptableObject
+namespace GridCore
 {
-    public int SizeX;
-    public int SizeY;
+    [CreateAssetMenu(fileName = "GridSettings", menuName = "Settings/GridSettings")]
+    public class GridSettingsObject : ScriptableObject
+    {
+        public int SizeX;
+        public int SizeY;
+    }
 }

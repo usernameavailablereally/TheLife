@@ -1,4 +1,4 @@
-namespace GridCore.Raw
+namespace GridCore
 {
     public struct GridData
     {

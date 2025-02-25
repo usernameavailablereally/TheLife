@@ -1,4 +1,4 @@
-using GridCore.Scene;
+using GridCore;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer;
@@ -10,7 +10,7 @@ namespace GameSystem
     {
         private readonly GridController _gridController;
         
-        [Inject]
+        [Inject]  // explicit constructor injection
         public InputController(GridController gridController)
         {
             _gridController = gridController;

@@ -1,5 +1,5 @@
-using GridCore.Raw;
-using GridCore.Scene;
+using System;
+using GridCore;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using VContainer;
@@ -14,19 +14,24 @@ namespace GameSystem
         [SerializeField] private Grid _sceneGrid;
         [SerializeField] private AssetsLoader _assetsLoader;
         [SerializeField] private UIManager _uiManager;
-        
-        
+        [SerializeField] private Camera _mainCamera;
+
         protected override void Configure(IContainerBuilder builder)
         {
+            // ScriptableObject asset instance
             builder.RegisterInstance(_gridSettings);
-            
+
+            // Hierarchy references
+            builder.RegisterComponent(_mainCamera);
             builder.RegisterComponent(_tilemap);
-            builder.RegisterComponent(_sceneGrid); 
+            builder.RegisterComponent(_sceneGrid);
             builder.RegisterComponent(_assetsLoader);
             builder.RegisterComponent(_uiManager);
-            
-            builder.Register<ILifeStrategy, DefaultStrategy>(Lifetime.Singleton);
+
+            // Non-mono classes
+            // here could be a StrategyPicker as MonoBehaviour with different strategies as ScriptableObjects, for switching strategies in runtime
             builder.Register<GridController>(Lifetime.Singleton);
+            builder.Register<LifePlayer>(Lifetime.Singleton).As<IStartable>().As<IDisposable>();
             builder.RegisterEntryPoint<GameController>();
             builder.Register<InputController>(Lifetime.Singleton).As<ITickable>();
         }

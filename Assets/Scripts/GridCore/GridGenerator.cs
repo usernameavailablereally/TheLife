@@ -1,8 +1,7 @@
-namespace GridCore.Raw
+namespace GridCore
 {
-    public static class GridFactory
+    public static class GridGenerator
     {
-        // TODO REMOVE STATIC
         public static CellUnit[,] CreateGrid(int sizeX, int sizeY)
         {
             var grid = new CellUnit[sizeX, sizeY];
