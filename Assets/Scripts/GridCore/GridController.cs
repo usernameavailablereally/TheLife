@@ -2,21 +2,29 @@ using GridCore.Raw;
 using Tools;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using VContainer;
 
 namespace GridCore.Scene
 {
-    public class GridController : MonoBehaviour
+    public class GridController
     {
-        [SerializeField] private Tilemap _tilemap;
-        [SerializeField] private Grid _sceneGrid; 
-        [SerializeField] private Tile _aliveTile;
-        [SerializeField] private Tile _deadTile;
+        private readonly Tilemap _tilemap;
+        private readonly Grid _sceneGrid;
+        private readonly Tile _aliveTile;
+        private readonly Tile _deadTile;
 
-        private GridData _gridData; 
-
+        private GridData _gridData;
         private Vector3Int _gridPosition;
-        ILifeStrategy _currentLifeStrategy;
- 
+        private ILifeStrategy _currentLifeStrategy;
+
+        [Inject]
+        public GridController(Tilemap tilemap, Grid sceneGrid, AssetsLoader assetsLoader)
+        {
+            _tilemap = tilemap;
+            _sceneGrid = sceneGrid;
+            _aliveTile = assetsLoader.AliveTile;
+            _deadTile = assetsLoader.DeadTile;
+        }
 
         public void InitGrid(int sizeX, int sizeY, ILifeStrategy targetStrategy)
         {
@@ -26,7 +34,7 @@ namespace GridCore.Scene
                 Grid = GridFactory.CreateGrid(sizeX, sizeY)
             };
         }
-    
+
         public void DrawGrid()
         {
             for (var i = 0; i < _gridData.SizeY; i++)
@@ -39,11 +47,10 @@ namespace GridCore.Scene
             }
         }
 
-        // TODO fix CAMERA getter
         public void SetAlive()
         {
             _gridPosition = GridHelper.ConvertToGridPosition(_sceneGrid, TouchPositionHelper.GetMousePosition(Camera.main));
-            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true); 
+            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true);
             DrawGrid();
         }
 

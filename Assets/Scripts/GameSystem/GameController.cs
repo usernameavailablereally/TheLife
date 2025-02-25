@@ -1,8 +1,10 @@
+using System;
 using Cysharp.Threading.Tasks;
 using GridCore.Raw;
 using GridCore.Scene;
 using LifeStrategies;
 using UnityEngine;
+using VContainer.Unity;
 
 namespace GameSystem
 {
@@ -12,25 +14,38 @@ namespace GameSystem
         Stop
     }
 
-    public class GameController : MonoBehaviour
+    public class GameController : IStartable, IDisposable
     {
-        [SerializeField] private int _sizeX;
-        [SerializeField] private int _sizeY;
-        [SerializeField] private GridController _gridController;
+        private readonly GridController _gridController;
+        private readonly UIManager _uiManager;
         
         private const float Delay = 0.15f;
         private LifeTimeStates _lifeTimeState = LifeTimeStates.Stop;
         private ILifeStrategy _targetStrategy;
-
-        //TODO advanced game entry point 
-        private void Awake()
+        private readonly GridSettingsObject _gridSettings;
+        
+        public GameController(GridController gridController, ILifeStrategy targetStrategy, GridSettingsObject gridSettings, UIManager uiManager)
         {
+            _gridController = gridController;
+            _targetStrategy = targetStrategy;
+            _gridSettings = gridSettings;
+            _uiManager = uiManager;
+        } 
+
+        public void Start()
+        {
+            Debug.Log("GameController.Initialize");
+
             _targetStrategy = StrategyPicker.GetTargetStrategy();
             _lifeTimeState = LifeTimeStates.Stop;
-            _gridController.InitGrid(_sizeX, _sizeY, _targetStrategy);
+            _gridController.InitGrid(_gridSettings.SizeX, _gridSettings.SizeY, _targetStrategy);
             _gridController.DrawGrid();
-        }
+            
+            _uiManager.StartButton.onClick.AddListener(StartGame);
+            _uiManager.StopButton.onClick.AddListener(StopGame);
+        } 
         
+        // TODO assign to button in script
         public void StartGame()
         {
             if (_lifeTimeState == LifeTimeStates.Play)
@@ -47,7 +62,7 @@ namespace GameSystem
         {
             _lifeTimeState = LifeTimeStates.Stop;
         } 
-        // TODO Extract to LifePlayer
+        // TODO Extract to LifePlayer (IAsyncStartable)
         // TODO CANCELLATION TOKEN
         private async UniTask LifeTimeLoop()
         {
@@ -63,5 +78,11 @@ namespace GameSystem
 
             _lifeTimeState = LifeTimeStates.Stop;
         }
+
+        public void Dispose()
+        { 
+            _uiManager.StartButton.onClick.RemoveListener(StartGame);
+            _uiManager.StopButton.onClick.RemoveListener(StopGame);
+        } 
     }
 }

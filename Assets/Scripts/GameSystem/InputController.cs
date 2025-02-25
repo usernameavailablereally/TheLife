@@ -1,19 +1,24 @@
 using GridCore.Scene;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using VContainer;
+using VContainer.Unity;
 
 namespace GameSystem
 {
-    public class InputController : MonoBehaviour
+    public class InputController : ITickable
     {
-        // TODO INJECT PROPERLY
-        [SerializeField] GridController _gridController;
-
-        private void Update()
-        { 
+        private readonly GridController _gridController;
+        
+        [Inject]
+        public InputController(GridController gridController)
+        {
+            _gridController = gridController;
+        }
+        public void Tick()
+        {
             CheckForMouseInput();
         }
-
 
         private void CheckForMouseInput()
         { 
