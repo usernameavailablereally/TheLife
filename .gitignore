@@ -51,7 +51,6 @@ crashlytics-build.properties
 # Packed Addressables
 *.bin
 *.hash
-*.json
 *.bundle
 
 # Temporary files
