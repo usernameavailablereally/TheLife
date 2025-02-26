@@ -1,5 +1,8 @@
+using System;
+
 namespace GridCore
 {
+    [Serializable]
     public struct CellUnit
     {
         public int PositionX { get; private set; }

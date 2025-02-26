@@ -27,13 +27,29 @@ namespace GridCore
             _mainCamera = mainCamera;
         }
 
-        public void InitGrid(int sizeX, int sizeY, ILifeStrategy targetStrategy)
+        public void InitGrid(CellUnit[,] grid)
         {
-            _currentLifeStrategy = targetStrategy;
+            var sizeX = grid.GetLength(0); 
+            var sizeY = grid.GetLength(1); 
             _gridData = new GridData(sizeX, sizeY)
             {
-                Grid = GridGenerator.CreateGrid(sizeX, sizeY)
+                Grid = grid
             };
+        }
+
+        public void InitGrid(GridData gridData)
+        {
+            _gridData = gridData;
+        }
+
+        public void InitStrategy(ILifeStrategy targetStrategy)
+        {
+            _currentLifeStrategy = targetStrategy;
+        }
+        
+        public GridData GetGridData()
+        {
+            return _gridData;
         }
 
         public void DrawGrid()
@@ -51,6 +67,8 @@ namespace GridCore
         public void SetAlive()
         {
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
+            if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
+            
             _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true);
             DrawGrid();
         }
@@ -58,6 +76,8 @@ namespace GridCore
         public void SetDead()
         {
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
+            if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
+            
             _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(false);
         }
 

@@ -1,5 +1,8 @@
+using System;
+
 namespace GridCore
 {
+    [Serializable]
     public struct GridData
     {
         public CellUnit[,] Grid;

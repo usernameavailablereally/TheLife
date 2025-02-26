@@ -35,5 +35,10 @@ namespace GridCore
 
             return neighbours;
         }
+
+        public static bool HasElement(this GridData gridData, int gridPositionX, int gridPositionY)
+        {
+            return gridPositionX >= 0 && gridPositionX < gridData.SizeX && gridPositionY >= 0 && gridPositionY < gridData.SizeY;
+        }
     }
 }

@@ -2,7 +2,7 @@ namespace GridCore
 {
     public static class GridGenerator
     {
-        public static CellUnit[,] CreateGrid(int sizeX, int sizeY)
+        public static CellUnit[,] CreateRandomGrid(int sizeX, int sizeY)
         {
             var grid = new CellUnit[sizeX, sizeY];
 

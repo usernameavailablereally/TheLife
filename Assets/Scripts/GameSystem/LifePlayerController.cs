@@ -8,7 +8,7 @@ using VContainer.Unity;
 
 namespace GameSystem
 {
-    public class LifePlayer : IStartable, IDisposable
+    public class LifePlayerController : IStartable, IDisposable
     { 
         private const int Delay = 150;
         private readonly GridController _gridController; 
@@ -17,7 +17,7 @@ namespace GameSystem
         private CancellationTokenSource _cancellationTokenSource;
 
         [Inject] // explicit constructor injection
-        public LifePlayer(GridController gridController, UIManager uiManager)
+        public LifePlayerController(GridController gridController, UIManager uiManager)
         {
             _gridController = gridController; 
             _lifeTimeState = LifeTimeStates.Stop;

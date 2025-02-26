@@ -5,7 +5,7 @@ namespace GridCore
     [CreateAssetMenu(fileName = "GridSettings", menuName = "Settings/GridSettings")]
     public class GridSettingsObject : ScriptableObject
     {
-        public int SizeX;
-        public int SizeY;
+        public int Height;
+        public int Width;
     }
 }
