@@ -21,19 +21,19 @@ namespace GameSystem
             // ScriptableObject asset instance
             builder.RegisterInstance(_gridSettings);
 
-            // Hierarchy references
+            // Scene references
             builder.RegisterComponent(_mainCamera);
             builder.RegisterComponent(_tilemap);
             builder.RegisterComponent(_sceneGrid);
             builder.RegisterComponent(_assetsLoader);
             builder.RegisterComponent(_uiManager);
+            // here could be a StrategyPicker as MonoBehaviour with different strategies as ScriptableObjects, for switching strategies in runtime by Designer
 
             // Non-mono classes
-            // here could be a StrategyPicker as MonoBehaviour with different strategies as ScriptableObjects, for switching strategies in runtime
             builder.Register<GridController>(Lifetime.Singleton);
-            builder.Register<SaveGameController>(Lifetime.Singleton).As<IInitializable>().As<IDisposable>(); 
-            builder.Register<LifePlayerController>(Lifetime.Singleton).As<IStartable>().As<IDisposable>();
-            builder.RegisterEntryPoint<GameController>();
+            builder.Register<SaveGameController>(Lifetime.Singleton).As<ISaveLoadClickHandler>(); 
+            builder.Register<LifeClickPlayerController>(Lifetime.Singleton).As<IDisposable>().As<IStartStopLifeClickHandler>();
+            builder.RegisterEntryPoint<GameController>().As<IRestartClickHandler>();
             builder.Register<InputController>(Lifetime.Singleton).As<ITickable>();
         }
     }

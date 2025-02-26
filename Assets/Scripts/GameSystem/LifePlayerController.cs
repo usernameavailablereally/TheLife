@@ -4,75 +4,99 @@ using Cysharp.Threading.Tasks;
 using GridCore;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace GameSystem
 {
-    public class LifePlayerController : IStartable, IDisposable
+    public enum LifePlayerStates
+    {
+        Play,
+        Stop
+    }
+    public class LifeClickPlayerController : IDisposable, IStartStopLifeClickHandler
     { 
         private const int Delay = 150;
         private readonly GridController _gridController; 
-        private LifeTimeStates _lifeTimeState;
-        private readonly UIManager _uiManager; 
+        private LifePlayerStates _lifePlayerState;
         private CancellationTokenSource _cancellationTokenSource;
 
         [Inject] // explicit constructor injection
-        public LifePlayerController(GridController gridController, UIManager uiManager)
+        public LifeClickPlayerController(GridController gridController)
         {
             _gridController = gridController; 
-            _lifeTimeState = LifeTimeStates.Stop;
-            _uiManager = uiManager;
+            _lifePlayerState = LifePlayerStates.Stop;
+        } 
+
+        public void OnStartLifeClicked()
+        {
+           StartLife();
         }
 
-        public void Start()
+        public void OnStopLifeClicked()
         {
-            _uiManager.StartButton.onClick.AddListener(StartLife);
-            _uiManager.StopButton.onClick.AddListener(StopLife);
+            StopLifeTask();
         }
 
         private void StartLife()
         {
-            if (_lifeTimeState == LifeTimeStates.Play)
+            if (_lifePlayerState == LifePlayerStates.Play)
             {
                 Debug.Log("Double click forbidden");
                 return;
             }
 
-            _lifeTimeState = LifeTimeStates.Play;
+            _lifePlayerState = LifePlayerStates.Play;
             _cancellationTokenSource = new CancellationTokenSource();
             StartLifeTask(_cancellationTokenSource.Token).Forget();
         }
 
         private async UniTask StartLifeTask(CancellationToken cancellation)
         {
+            // as we expect Strategies (ProcessNextGeneration) may vary, not the GridControllers, we can assume DrawGrid is safe
+            // discussable, but all the DrawGrid calls might also be caught potentially
+            
             _gridController.DrawGrid();
-            while (_lifeTimeState == LifeTimeStates.Play)
+            try
             {
-                if (cancellation.IsCancellationRequested)
+                while (_lifePlayerState == LifePlayerStates.Play)
                 {
-                    break;
+                    if (cancellation.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        _gridController.ProcessNextGeneration();
+                        _gridController.DrawGrid();
+                        await UniTask.Delay(Delay, cancellationToken: cancellation);
+                    }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        Debug.LogError($"Exception during StartLifeTask : {ex.Message}");
+                        StopLifeTask();
+                        break;
+                    }
                 }
-
-                _gridController.ProcessNextGeneration();
-                _gridController.DrawGrid();
-
-                await UniTask.Delay(Delay, cancellationToken: cancellation);
             }
-
-            _lifeTimeState = LifeTimeStates.Stop;
+            catch (OperationCanceledException)
+            {
+                Debug.Log("LifeTask was canceled");
+            }
+            finally
+            {
+                _lifePlayerState = LifePlayerStates.Stop;
+            }
         }
 
-        private void StopLife()
+        private void StopLifeTask()
         {
-            _lifeTimeState = LifeTimeStates.Stop;
+            _lifePlayerState = LifePlayerStates.Stop;
             _cancellationTokenSource?.Cancel();
         }
 
         public void Dispose()
         {
-            StopLife();
-            _uiManager.StartButton.onClick.RemoveListener(StartLife);
-            _uiManager.StopButton.onClick.RemoveListener(StopLife);
+            StopLifeTask();
         }
     }
 }

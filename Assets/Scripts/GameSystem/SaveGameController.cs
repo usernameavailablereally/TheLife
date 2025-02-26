@@ -1,30 +1,30 @@
-using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using GridCore;
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace GameSystem
 {
-    public class SaveGameController : IInitializable, IDisposable
+    public class SaveGameController : ISaveLoadClickHandler
     {
         private const string FileName = "GAMESAVE";
         private readonly GridController _gridController;
-        private readonly UIManager _uiManager;
 
         [Inject] // explicit constructor injection
-        public SaveGameController(GridController gridController, UIManager uiManager)
+        public SaveGameController(GridController gridController)
         {
             _gridController = gridController;
-            _uiManager = uiManager;
         }
 
-        public void Initialize()
+        public void OnSaveClicked()
         {
-            _uiManager.SaveButton.onClick.AddListener(SaveGame);
-            _uiManager.LoadButton.onClick.AddListener(LoadGame);
+            SaveGame();
+        }
+
+        public void OnLoadClicked()
+        {
+           LoadGame();
         }
 
         private void SaveGame()
@@ -52,12 +52,6 @@ namespace GameSystem
             _gridController.InitGrid(gridData);
             _gridController.DrawGrid();
             Debug.LogFormat("Grid loaded from file: {0}", filePath);
-        }
-
-        public void Dispose()
-        {
-            _uiManager.SaveButton.onClick.RemoveAllListeners();
-            _uiManager.LoadButton.onClick.RemoveAllListeners();
         }
     }
 }

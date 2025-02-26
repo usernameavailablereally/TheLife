@@ -1,3 +1,4 @@
+using System;
 using LifeStrategies;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -53,13 +54,13 @@ namespace GridCore
         }
 
         public void DrawGrid()
-        {
-            for (var i = 0; i < _gridData.SizeY; i++)
+        { 
+            for (var i = 0; i < _gridData.SizeX; i++)
             {
-                for (var j = 0; j < _gridData.SizeX; j++)
+                for (var j = 0; j < _gridData.SizeY; j++)
                 {
                     var p = new Vector3Int(i, j, 0);
-                    _tilemap.SetTile(p, _gridData.Grid[j, i].IsAlive() ? _aliveTile : _deadTile);
+                    _tilemap.SetTile(p, _gridData.Grid[i, j].IsAlive() ? _aliveTile : _deadTile);
                 }
             }
         }
@@ -69,7 +70,7 @@ namespace GridCore
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
             
-            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(true);
+            _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(true);
             DrawGrid();
         }
 
@@ -78,7 +79,7 @@ namespace GridCore
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
             
-            _gridData.Grid[_gridPosition.y, _gridPosition.x].SetState(false);
+            _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(false);
         }
 
         public void ProcessNextGeneration()

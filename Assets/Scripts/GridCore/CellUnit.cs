@@ -2,6 +2,7 @@ using System;
 
 namespace GridCore
 {
+    // TODO: Don't mix up Scriptable and Serializable terms :D
     [Serializable]
     public struct CellUnit
     {
