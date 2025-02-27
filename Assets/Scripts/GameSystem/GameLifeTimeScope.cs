@@ -30,7 +30,7 @@ namespace GameSystem
             // here could be a StrategyPicker as MonoBehaviour with different strategies as ScriptableObjects, for switching strategies in runtime by Designer
 
             // Non-mono classes
-            builder.Register<GridController>(Lifetime.Singleton).As<IGridClickHandler>();
+            builder.Register<GridController>(Lifetime.Singleton).AsSelf().As<IGridClickHandler>();
             builder.Register<SaveGameController>(Lifetime.Singleton).As<ISaveLoadClickHandler>(); 
             builder.Register<LifeClickPlayerController>(Lifetime.Singleton).As<IDisposable>().As<IStartStopLifeClickHandler>();
             builder.RegisterEntryPoint<GameController>().As<IRestartClickHandler>();
