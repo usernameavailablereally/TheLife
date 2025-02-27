@@ -63,3 +63,9 @@ public interface ISaveLoadClickHandler
     void OnSaveClicked();
     void OnLoadClicked();
 }
+
+public interface IGridClickHandler
+{
+    void OnGridLeftClick();
+    void OnGridRightClick();
+}

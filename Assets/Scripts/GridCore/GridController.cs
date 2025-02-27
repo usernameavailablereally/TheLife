@@ -1,4 +1,3 @@
-using System;
 using LifeStrategies;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -6,7 +5,7 @@ using VContainer;
 
 namespace GridCore
 {
-    public class GridController
+    public class GridController : IGridClickHandler
     {
         private readonly Tilemap _tilemap;
         private readonly Grid _sceneGrid;
@@ -65,26 +64,37 @@ namespace GridCore
             }
         }
 
-        public void SetAlive()
+        public void ProcessNextGeneration()
+        {
+            _currentLifeStrategy.ProcessNextGeneration(ref _gridData);
+        }
+
+        public void OnGridLeftClick()
+        {
+            SetAlive();
+            DrawGrid();
+        }
+
+        public void OnGridRightClick()
+        {
+            SetDead();
+            DrawGrid();
+        }
+
+        private void SetAlive()
         {
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
             
             _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(true);
-            DrawGrid();
         }
 
-        public void SetDead()
+        private void SetDead()
         {
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
             
             _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(false);
-        }
-
-        public void ProcessNextGeneration()
-        {
-            _currentLifeStrategy.ProcessNextGeneration(ref _gridData);
         }
     }
 }

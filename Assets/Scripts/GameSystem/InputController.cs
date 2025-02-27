@@ -9,38 +9,43 @@ namespace GameSystem
     public class InputController : ITickable
     {
         private readonly GridController _gridController;
-        
-        [Inject]  // explicit constructor injection
-        public InputController(GridController gridController)
+        private readonly IGridClickHandler _gridClickHandler; 
+        private bool IsLeftClick() => Input.GetMouseButton(0);
+        private bool IsRightClick() => Input.GetMouseButton(1);
+
+        [Inject] // explicit constructor injection
+        public InputController(GridController gridController, IGridClickHandler gridClickHandler)
         {
             _gridController = gridController;
+            _gridClickHandler = gridClickHandler;
         }
+
         public void Tick()
         {
             CheckForMouseInput();
         }
 
         private void CheckForMouseInput()
-        { 
-            if (Input.GetMouseButton(0))
+        {
+            if (IsLeftClick())
             {
                 if (EventSystem.current.IsPointerOverGameObject())
                 {
                     return;
                 }
 
-                _gridController.SetAlive();
-            }
- 
-            if (!Input.GetMouseButton(1)) return;
-            
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                return;
+                _gridController.OnGridLeftClick();
             }
 
-            _gridController.SetDead();
-            _gridController.DrawGrid();
-        } 
+            if (IsRightClick())
+            {
+                if (EventSystem.current.IsPointerOverGameObject())
+                {
+                    return;
+                }
+
+                _gridClickHandler.OnGridRightClick();
+            }
+        }
     }
 }
