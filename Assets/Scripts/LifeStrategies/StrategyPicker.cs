@@ -5,7 +5,8 @@ namespace LifeStrategies
         // can be scaled for many strategies
         public ILifeStrategy GetTargetStrategy()
         {
-            return new DefaultStrategy();
+            var baseStrategy = new DefaultStrategy();
+            return new ThreadSafeStrategyDecorator(baseStrategy);
         }
     }
 }

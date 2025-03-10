@@ -12,18 +12,20 @@ namespace GameSystem
         Play,
         Stop
     }
-    public class LifeClickPlayerController : IDisposable, IStartStopLifeClickHandler
+    public class LifePlayerController : IDisposable, IStartStopLifeClickHandler
     { 
         private const int Delay = 150;
+        private readonly IGenerationProcessor _generationProcessor;
         private readonly GridController _gridController; 
         private LifePlayerStates _lifePlayerState;
         private CancellationTokenSource _cancellationTokenSource;
 
         [Inject] // explicit constructor injection
-        public LifeClickPlayerController(GridController gridController)
+        public LifePlayerController(GridController gridController, IGenerationProcessor generationProcessor)
         {
             _gridController = gridController; 
             _lifePlayerState = LifePlayerStates.Stop;
+            _generationProcessor = generationProcessor;
         } 
 
         public void OnStartLifeClicked()
@@ -66,7 +68,7 @@ namespace GameSystem
 
                     try
                     {
-                        _gridController.ProcessNextGeneration();
+                        _generationProcessor.ProcessNextGeneration();
                         _gridController.DrawGrid();
                         await UniTask.Delay(Delay, cancellationToken: cancellation);
                     }

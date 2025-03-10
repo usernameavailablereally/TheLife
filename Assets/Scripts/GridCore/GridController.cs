@@ -1,4 +1,4 @@
-using LifeStrategies;
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using VContainer;
@@ -15,22 +15,25 @@ namespace GridCore
 
         private GridData _gridData;
         private Vector3Int _gridPosition;
-        private ILifeStrategy _currentLifeStrategy;
 
-        [Inject] // explicit constructor injection
+        [Inject]
         public GridController(Tilemap tilemap, Grid sceneGrid, AssetsLoader assetsLoader, Camera mainCamera)
         {
-            _tilemap = tilemap;
-            _sceneGrid = sceneGrid;
-            _aliveTile = assetsLoader.AliveTile;
-            _deadTile = assetsLoader.DeadTile;
-            _mainCamera = mainCamera;
+            _tilemap = tilemap ?? throw new ArgumentNullException(nameof(tilemap));
+            _sceneGrid = sceneGrid ?? throw new ArgumentNullException(nameof(sceneGrid));
+            _mainCamera = mainCamera ?? throw new ArgumentNullException(nameof(mainCamera));
+        
+            if (assetsLoader == null) throw new ArgumentNullException(nameof(assetsLoader));
+            _aliveTile = assetsLoader.AliveTile ?? throw new ArgumentNullException(nameof(assetsLoader.AliveTile));
+            _deadTile = assetsLoader.DeadTile ?? throw new ArgumentNullException(nameof(assetsLoader.DeadTile));
         }
 
         public void InitGrid(CellUnit[,] grid)
         {
-            var sizeX = grid.GetLength(0); 
-            var sizeY = grid.GetLength(1); 
+            if (grid == null) throw new ArgumentNullException(nameof(grid));
+        
+            var sizeX = grid.GetLength(0);
+            var sizeY = grid.GetLength(1);
             _gridData = new GridData(sizeX, sizeY)
             {
                 Grid = grid
@@ -42,59 +45,46 @@ namespace GridCore
             _gridData = gridData;
         }
 
-        public void InitStrategy(ILifeStrategy targetStrategy)
-        {
-            _currentLifeStrategy = targetStrategy;
-        }
-        
         public GridData GetGridData()
         {
             return _gridData;
         }
 
         public void DrawGrid()
-        { 
+        {
+            if (_gridData.Grid == null) throw new InvalidOperationException("Grid is not initialized");
+    
+            var p = new Vector3Int();
             for (var i = 0; i < _gridData.SizeX; i++)
             {
                 for (var j = 0; j < _gridData.SizeY; j++)
                 {
-                    var p = new Vector3Int(i, j, 0);
+                    p.Set(i, j, 0);
                     _tilemap.SetTile(p, _gridData.Grid[i, j].IsAlive() ? _aliveTile : _deadTile);
                 }
             }
         }
 
-        public void ProcessNextGeneration()
-        {
-            _currentLifeStrategy.ProcessNextGeneration(ref _gridData);
-        }
-
         public void OnGridLeftClick()
         {
-            SetAlive();
+            SetCellState(true);
             DrawGrid();
         }
 
         public void OnGridRightClick()
         {
-            SetDead();
+            SetCellState(false);
             DrawGrid();
         }
 
-        private void SetAlive()
+        private void SetCellState(bool isAlive)
         {
+            if (_gridData.Grid == null) throw new InvalidOperationException("GridData is not initialized");
+        
             _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
             if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
-            
-            _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(true);
-        }
 
-        private void SetDead()
-        {
-            _gridPosition = _sceneGrid.ConvertToGridPosition(_mainCamera);
-            if (!_gridData.HasElement(_gridPosition.x, _gridPosition.y)) return;
-            
-            _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(false);
+            _gridData.Grid[_gridPosition.x, _gridPosition.y].SetState(isAlive);
         }
     }
 }
